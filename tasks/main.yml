@@ -1,0 +1,36 @@
+---
+- name: include variables
+  include_role:
+    name: lihas-variables
+  when: configspaces is not defined
+- name: install software
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - bird
+  loop_control:
+    loop_var: item
+- name: net.ipv4.ip_forward = 1
+  sysctl:
+    name: net.ipv4.ip_forward
+    sysctl_file: /etc/sysctl.d/98-ansible.conf
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes 
+- name: bird config files
+  template:
+    src: "{{ file }}.j2"
+    dest: "/{{ file }}"
+    owner: root
+    group: root
+    mode: 0644
+  loop:
+    - etc/bird/bird_protocols_static.conf
+    - etc/bird/bird_protocols_ospf.conf
+    - etc/bird/bird.conf
+  loop_control:
+    loop_var: file
+  notify: reload_bird
+

@@ -1,0 +1,67 @@
+# ansible managed
+{% if hostvars[inventory_hostname]['bird'] is defined and hostvars[inventory_hostname]['bird']['ospf'] is defined %}
+{%   for ospf in hostvars[inventory_hostname]['bird']['ospf'] | flatten(levels=1) %}
+protocol ospf {{ ospf.key }} {
+  preference 100;
+  import all;
+  export all;
+  rfc1583compat no;
+  stub router no;
+  tick 1;
+  ecmp no;
+  {% for area in hostvars[inventory_hostname]['bird']['ospf'][ospf].area | flatten(levels=1) %}
+  area {{ area.key }} {
+    external {
+      0.0.0.0/0;
+    };
+    {% for iface in hostvars[inventory_hostname]['bird']['ospf'][ospf]['area'].area.interface | flatten(levels=1) %}
+    interface "{{ iface.key }}" {
+      cost 100;
+      hello 10;
+      poll 20;
+      retransmit 5;
+      priority 10;
+      wait 40;
+      type bcast;
+    };
+    {% endfor %}
+  };
+  {% endfor %}
+};
+{%   endfor %}
+{% endif %}
+
+{% for config in hostvars[inventory_hostname]['configspaces'] | default([]) %}
+{%   if hostvars[inventory_hostname][config]['config']['bird'] is defined and hostvars[inventory_hostname][config]['config']['bird']['ospf'] is defined %}
+{%     for ospf in hostvars[inventory_hostname][config]['config']['bird']['ospf'] | flatten(levels=1) %}
+protocol ospf {{ ospf }} {
+  preference 100;
+  import all;
+  export all;
+  rfc1583compat no;
+  stub router no;
+  tick 1;
+  ecmp no;
+  {% for area in hostvars[inventory_hostname][config]['config']['bird']['ospf'][ospf]['area'] | flatten(levels=1) %}
+  area {{ area }} {
+    external {
+      0.0.0.0/0;
+    };
+    {% for iface in hostvars[inventory_hostname][config]['config']['bird']['ospf'][ospf]['area'][area]['interface'] | flatten(levels=1) %}
+    interface "{{ iface }}" {
+      cost 100;
+      hello 10;
+      poll 20;
+      retransmit 5;
+      priority 10;
+      wait 40;
+      type bcast;
+    };
+    {% endfor %}
+  };
+  {% endfor %}
+};
+{%     endfor %}
+{%   endif %}
+{% endfor %}
+

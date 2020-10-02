@@ -1,0 +1,81 @@
+# ansible managed
+log syslog { warning, error, auth, fatal, bug };
+timeformat protocol iso long;
+
+router id {{ hostvars[inventory_hostname].bird.routerid }};
+
+function ip_local () {
+  return {{ hostvars[inventory_hostname].bird.routerid }};
+}
+template bgp t_bgp_local {
+  local as {{ hostvars[inventory_hostname].bird.as }};
+}
+{% if hostvars[inventory_hostname].bird.static is defined %}
+protocol static static_{{ inventory_hostname | replace('-','_') }} {
+{% for route in hostvars[inventory_hostname].bird.static %}
+    {{ route }}
+{% endfor %}
+}
+{% endif %}
+function defaultroute() {
+  return net ~ [ 0.0.0.0/0 ];
+}
+function net_cix() {
+  # CIX networks, don't export
+  # return net ~ [ 100.100.0.0/16+ ];
+  return false;
+}
+function net_martian() {
+  return net ~ [ 0.0.0.0/8, 10.0.0.0/8+, 100.64.0.0/10+, 127.0.0.0/8+, 169.254.0.0/16+, 172.16.0.0/12+,
+    192.0.0.0/24+, 192.0.2.0/24+, 192.168.0.0/16+, 198.18.0.0/15+, 198.51.100.0/24+, 203.0.113.0/24+, 224.0.0.0/3+ ];
+}
+
+filter nodefaultroute {
+  if net ~ [ 0.0.0.0/0 ] then reject;
+  else accept;
+}
+
+include "/etc/bird/bird_filters_*.conf";
+include "/etc/bird/bird_templates_*.conf";
+
+protocol device {
+  scan time 10;           # Scan interfaces every 10 seconds
+}
+
+{% if hostvars[inventory_hostname].bird.filters.bgprouting is not defined %}
+filter bgprouting {
+  krt_metric = 100;       
+  if net = 0.0.0.0/0 then reject;
+  if net ~ [ 10.0.0.0/8+ ] then accept;
+  if net ~ [ 172.16.0.0/12+ ] then accept;
+  if net ~ [ 192.168.0.0/16+ ] then accept;
+  reject;
+}
+{% endif %}
+
+protocol static static_blackhole {
+  # Blackhole um private IPs nicht ins Internet zu routen, hier als unreachable, damit gleich eine Fehlermeldung kommt
+  route 10.0.0.0/8 unreachable;
+  route 172.16.0.0/20 unreachable;
+  route 192.168.0.0/16 unreachable;
+  # die unbekannteren
+  route 0.0.0.0/8 unreachable;
+  route 100.64.0.0/10 unreachable;
+  route 169.254.0.0/16 unreachable;
+  route 192.0.0.0/24 unreachable;
+  route 192.0.2.0/24 unreachable;
+  route 198.18.0.0/15 unreachable;
+  route 198.51.100.0/24 unreachable;
+  route 203.0.113.0/24 unreachable;
+  route 224.0.0.0/3 unreachable;
+}
+
+protocol kernel {
+  persist;
+  scan time 10;
+  import none;
+  export all;
+}
+include "/etc/bird/bird_protocols_*.conf";
+
+include "/etc/bird/bird_this_location*.conf";
