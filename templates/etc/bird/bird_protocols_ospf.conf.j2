@@ -9,20 +9,22 @@ protocol ospf {{ ospf.key }} {
   stub router no;
   tick 1;
   ecmp no;
-  {% for area in hostvars[inventory_hostname]['bird']['ospf'][ospf.key]['area'] | default({}) | dict2items %}
+  {% for area in ospf['area'] | default({}) | dict2items %}
   area {{ area.key }} {
     external {
       0.0.0.0/0;
     };
-    {% for iface in hostvars[inventory_hostname]['bird']['ospf'][ospf.key]['area'][area.key]['interface'] | default({}) | dict2items %}
+    {% for iface in area['interface'] | default({}) | dict2items %}
     interface "{{ iface.key }}" {
-      cost 100;
+      {% if iface.cost is defined %}cost {{ iface.cost }}{% else %}cost 200{% endif %};
       hello 10;
       poll 20;
       retransmit 5;
       priority 10;
       wait 40;
       type bcast;
+      {% if iface['authentication'] is defined %}authentication  {{ iface['authentication'] }};{% endif %}
+      {% if iface['password'] is defined %}password  "{{ iface['password'] }}";{% endif %}
     };
     {% endfor %}
   };
@@ -33,8 +35,8 @@ protocol ospf {{ ospf.key }} {
 
 {% for config in hostvars[inventory_hostname]['configspaces'] | default([]) %}
 {%   if hostvars[inventory_hostname][config]['config']['bird'] is defined and hostvars[inventory_hostname][config]['config']['bird']['ospf'] is defined %}
-{%     for ospf in hostvars[inventory_hostname][config]['config']['bird']['ospf'] | flatten(levels=1) %}
-protocol ospf {{ ospf }} {
+{%     for ospf in hostvars[inventory_hostname][config]['config']['bird']['ospf'] | default({}) | dict2items %}
+protocol ospf {{ ospf.key }} {
   preference 100;
   import all;
   export all;
@@ -42,20 +44,22 @@ protocol ospf {{ ospf }} {
   stub router no;
   tick 1;
   ecmp no;
-  {% for area in hostvars[inventory_hostname][config]['config']['bird']['ospf'][ospf]['area'] | flatten(levels=1) %}
-  area {{ area }} {
+  {% for area in ospf['area'] | default({}) | dict2items %}
+  area {{ area.key }} {
     external {
       0.0.0.0/0;
     };
-    {% for iface in hostvars[inventory_hostname][config]['config']['bird']['ospf'][ospf]['area'][area]['interface'] | flatten(levels=1) %}
-    interface "{{ iface }}" {
-      cost 100;
+    {% for iface in area['interface'] | default({}) | dict2items %}
+    interface "{{ iface.key }}" {
+      {% if iface.cost is defined %}cost {{ iface.cost }}{% else %}cost 200{% endif %};
       hello 10;
       poll 20;
       retransmit 5;
       priority 10;
       wait 40;
       type bcast;
+      {% if iface['authentication'] is defined %}authentication  {{ iface['authentication'] }};{% endif %}
+      {% if iface['password'] is defined %}password  "{{ iface['password'] }}";{% endif %}
     };
     {% endfor %}
   };

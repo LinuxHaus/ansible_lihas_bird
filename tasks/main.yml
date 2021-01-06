@@ -34,3 +34,17 @@
     loop_var: file
   notify: reload_bird
 
+- name: extra bird config files, create list
+  set_fact:
+    birdfiles: "{{ birdfiles | default([]) + hostvars[inventory_hostname][item]['config']['bird']['templates'] | default([]) }}"
+    cacheable: no
+  loop: "{{ configspaces }}"
+- name: extra bird config files
+  template:
+    dest: "/{{ item }}"
+    src: "{{ item }}"
+  loop: "{{ birdfiles }}"
+  loop_control:
+    loop_var: item
+  notify: reload_bird
+

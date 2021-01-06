@@ -10,13 +10,6 @@ function ip_local () {
 template bgp t_bgp_local {
   local as {{ hostvars[inventory_hostname].bird.as }};
 }
-{% if hostvars[inventory_hostname].bird.static is defined %}
-protocol static static_{{ inventory_hostname | replace('-','_') }} {
-{% for route in hostvars[inventory_hostname].bird.static %}
-    {{ route }}
-{% endfor %}
-}
-{% endif %}
 function defaultroute() {
   return net ~ [ 0.0.0.0/0 ];
 }
@@ -36,12 +29,6 @@ filter nodefaultroute {
 }
 
 include "/etc/bird/bird_filters_*.conf";
-include "/etc/bird/bird_templates_*.conf";
-
-protocol device {
-  scan time 10;           # Scan interfaces every 10 seconds
-}
-
 {% if hostvars[inventory_hostname].bird.filters.bgprouting is not defined %}
 filter bgprouting {
   krt_metric = 100;       
@@ -52,6 +39,11 @@ filter bgprouting {
   reject;
 }
 {% endif %}
+include "/etc/bird/bird_templates_*.conf";
+
+protocol device {
+  scan time 10;           # Scan interfaces every 10 seconds
+}
 
 protocol static static_blackhole {
   # Blackhole um private IPs nicht ins Internet zu routen, hier als unreachable, damit gleich eine Fehlermeldung kommt
