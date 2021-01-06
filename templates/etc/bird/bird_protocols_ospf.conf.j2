@@ -9,12 +9,14 @@ protocol ospf {{ ospf.key }} {
   stub router no;
   tick 1;
   ecmp no;
+  {% if hostvars[inventory_hostname]['bird']['ospf'][ospf].area is defined %}
   {% for area in hostvars[inventory_hostname]['bird']['ospf'][ospf].area | flatten(levels=1) %}
   area {{ area.key }} {
     external {
       0.0.0.0/0;
     };
-    {% for iface in hostvars[inventory_hostname]['bird']['ospf'][ospf]['area'].area.interface | flatten(levels=1) %}
+    {% if iface in hostvars[inventory_hostname]['bird']['ospf'][ospf]['area'][area]["interface"] is defined %}
+    {% for iface in hostvars[inventory_hostname]['bird']['ospf'][ospf]['area'][area]["interface"] | flatten(levels=1) %}
     interface "{{ iface.key }}" {
       cost 100;
       hello 10;
@@ -25,8 +27,10 @@ protocol ospf {{ ospf.key }} {
       type bcast;
     };
     {% endfor %}
+    {% endif %}
   };
   {% endfor %}
+  {% endif %}
 };
 {%   endfor %}
 {% endif %}
