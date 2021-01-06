@@ -1,5 +1,5 @@
 ---
-# vars file for lihas-bird
+# vars file for lihas_bird
 bird:
   as: 65000
   routerid: 192.168.255.255

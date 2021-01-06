@@ -1,4 +1,4 @@
-# lihas-bird
+# lihas_bird
 ## Role Name
 
 Install and configure bird routing daemon
