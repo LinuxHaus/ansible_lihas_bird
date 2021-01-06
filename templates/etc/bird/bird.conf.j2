@@ -56,7 +56,7 @@ filter bgprouting {
 protocol static static_blackhole {
   # Blackhole um private IPs nicht ins Internet zu routen, hier als unreachable, damit gleich eine Fehlermeldung kommt
   route 10.0.0.0/8 unreachable;
-  route 172.16.0.0/20 unreachable;
+  route 172.16.0.0/12 unreachable;
   route 192.168.0.0/16 unreachable;
   # die unbekannteren
   route 0.0.0.0/8 unreachable;
