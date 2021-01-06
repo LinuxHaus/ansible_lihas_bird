@@ -19,6 +19,14 @@ Additional files not managed by this role:
 * `/etc/bird/bird_protocols_*.conf`
 * `/etc/bird/bird_this_location.conf`
 
+## Requirements
+To run solo:
+
+```
+ansible-galaxy install -r requirements.yml
+ansible-playbook -i localhost, bird.yml
+```
+
 ## Role Variables
 
 * bird.as: ASN
