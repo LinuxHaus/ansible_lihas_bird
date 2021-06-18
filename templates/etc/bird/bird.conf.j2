@@ -66,7 +66,7 @@ protocol kernel {
   persist;
   scan time 10;
   import none;
-  export all;
+  export filter { krt_metric = 1000; krt_prefsrc = ip_local(); accept; };
 }
 include "/etc/bird/bird_protocols_*.conf";
 include "/etc/bird/bird_standortvernetzung*.conf";
