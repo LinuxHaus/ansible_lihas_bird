@@ -44,7 +44,7 @@ filter bgprouting {
 include "/etc/bird/bird_templates_*.conf";
 
 protocol device {
-  scan time {{ bird.scantime | default('10') }};           # Scan interfaces every {{ bird.scantime | default('10') }} seconds
+  scan time {{ hostvars[inventory_hostname].bird.scantime | default('10') }};           # Scan interfaces every {{ hostvars[inventory_hostname].bird.scantime | default('10') }} seconds
 }
 
 protocol static static_blackhole {
@@ -66,7 +66,7 @@ protocol static static_blackhole {
 
 protocol kernel {
   persist;
-  scan time {{ bird.scantime | default('10') }};
+  scan time {{ hostvars[inventory_hostname].bird.scantime | default('10') }};
   import none;
   export filter { krt_metric = 1000; krt_prefsrc = ip_local(); accept; };
 }
