@@ -2,6 +2,8 @@
 log syslog { warning, error, auth, fatal, bug };
 timeformat protocol iso long;
 
+include "/etc/bird/bird_this_host*.conf";
+
 router id {{ hostvars[inventory_hostname].bird.routerid }};
 
 function ip_local () {
@@ -42,7 +44,7 @@ filter bgprouting {
 include "/etc/bird/bird_templates_*.conf";
 
 protocol device {
-  scan time 10;           # Scan interfaces every 10 seconds
+  scan time {{ bird.scantime | default('10') }};           # Scan interfaces every {{ bird.scantime | default('10') }} seconds
 }
 
 protocol static static_blackhole {
@@ -64,7 +66,7 @@ protocol static static_blackhole {
 
 protocol kernel {
   persist;
-  scan time 10;
+  scan time {{ bird.scantime | default('10') }};
   import none;
   export filter { krt_metric = 1000; krt_prefsrc = ip_local(); accept; };
 }

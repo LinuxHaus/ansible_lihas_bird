@@ -31,6 +31,7 @@ ansible-playbook -i localhost, bird.yml
 
 * bird.as: ASN
 * bird.routerid
+* bird.scantime
 * bird.net_cix: []
 * bird.static: []
     * static route annoucements
