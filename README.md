@@ -39,4 +39,12 @@ ansible-playbook -i localhost, bird.yml
     * TODO: dictionary with filters consisting of lines 
 * bird.filter.bgprouting: []
     * TODO: content of filter named bgprouting
+* %.config.bird.ospf: {}
+    * Areas
+* %.config.bird.ospf.X.import_filter: import filter
+* %.config.bird.ospf.X.export_filter: export filter
+* %.config.bird.ospf.X.interface: {}
+    * Interfaces in Area
+* %.config.bird.ospf.X.interface.X.cost:
+    * cost
 
