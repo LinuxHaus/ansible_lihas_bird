@@ -43,7 +43,7 @@
   template:
     dest: "/{{ item }}"
     src: "{{ item }}"
-  loop: "{{ birdfiles }}"
+  loop: "{{ birdfiles | default([]) }}"
   loop_control:
     loop_var: item
   notify: reload_bird
