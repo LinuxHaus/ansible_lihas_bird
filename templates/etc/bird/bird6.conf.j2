@@ -1,0 +1,61 @@
+# ansible managed
+log syslog { warning, error, auth, fatal, bug };
+timeformat protocol iso long;
+
+include "/etc/bird/bird6_this_host*.conf";
+
+router id {{ hostvars[inventory_hostname].bird.routerid }};
+
+function ip_local () {
+  return {{ hostvars[inventory_hostname].bird.ipv6_local }};
+}
+template bgp t_bgp_local {
+  local as {{ hostvars[inventory_hostname].bird.as }};
+}
+function defaultroute() {
+  return net ~ [ ::/0 ];
+}
+#function net_cix() {
+#  # CIX networks, don't export
+#  # return net ~ [ 100.100.0.0/16+ ];
+#  return false;
+#}
+function net_martian() {
+  if net ~ [ 3ffe::/16+, 2001:db8::/32+ ] then return true;
+  if net ~ [ 2001::/32 ] then return false;
+  if net ~ [ 2001::/32+ ] then return true;
+  if net ~ [ 2002::/16 ] then return false;
+  if net ~ [ 2a10::/12+ ] then return false;
+  if net ~ [ 2002::/16+, 0000::/8+, fe00::/9+, fe00::/8+ ] then return true;
+  if net ~ [ 2000::/3{3,48}, 0::/0{0,56} ] then return false;
+  return true;
+}
+
+filter nodefaultroute {
+  if defaultroute() then reject;
+  else accept;
+}
+
+include "/etc/bird/bird6_filters_*.conf";
+include "/etc/bird/bird6_templates_*.conf";
+
+protocol device {
+  scan time {{ hostvars[inventory_hostname].bird.scantime | default('10') }};           # Scan interfaces every {{ hostvars[inventory_hostname].bird.scantime | default('10') }} seconds
+}
+
+protocol static static_blackhole {
+  # Blackhole um private IPs nicht ins Internet zu routen, hier als unreachable, damit gleich eine Fehlermeldung kommt
+  route 3ffe::/16 unreachable;
+  route 2001:db8::/32 unreachable;
+}
+
+protocol kernel {
+  persist;
+  scan time {{ hostvars[inventory_hostname].bird.scantime | default('10') }};
+  import none;
+  export filter { krt_metric = 1000; krt_prefsrc = ip_local(); accept; };
+}
+include "/etc/bird/bird6_protocols_*.conf";
+include "/etc/bird/bird6_standortvernetzung*.conf";
+
+include "/etc/bird/bird6_this_location*.conf";

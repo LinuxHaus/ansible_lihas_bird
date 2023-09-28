@@ -1,50 +1,53 @@
 ---
-- name: include variables
-  include_role:
+- name: Include variables
+  ansible.builtin.include_role:
     name: lihas_variables
   when: configspaces is not defined
-- name: install software
-  apt:
+- name: Install software
+  ansible.builtin.apt:
     name: "{{ item }}"
     state: present
   loop:
     - bird
   loop_control:
     loop_var: item
-- name: net.ipv4.ip_forward = 1
-  sysctl:
+- name: Sysctl net.ipv4.ip_forward = 1
+  ansible.posix.sysctl:
     name: net.ipv4.ip_forward
     sysctl_file: /etc/sysctl.d/98-ansible.conf
     value: '1'
-    sysctl_set: yes
+    sysctl_set: true
     state: present
-    reload: yes 
-- name: bird config files
-  template:
+    reload: true
+- name: Config files for bird
+  ansible.builtin.template:
     src: "{{ file }}.j2"
     dest: "/{{ file }}"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   loop:
     - etc/bird/bird_protocols_static.conf
     - etc/bird/bird_protocols_ospf.conf
     - etc/bird/bird.conf
+    - etc/bird/bird6_protocols_static.conf
+    - etc/bird/bird6_protocols_ospf.conf
+    - etc/bird/bird6.conf
   loop_control:
     loop_var: file
-  notify: reload_bird
-
-- name: extra bird config files, create list
-  set_fact:
+  notify: Reload bird
+- name: Extra bird config files, create list
+  ansible.builtin.set_fact:
     birdfiles: "{{ birdfiles | default([]) + hostvars[inventory_hostname][item]['config']['bird']['templates'] | default([]) }}"
-    cacheable: no
+    cacheable: false
   loop: "{{ configspaces }}"
-- name: extra bird config files
-  template:
+- name: Extra bird config files
+  ansible.builtin.template:
     dest: "/{{ item }}"
     src: "{{ item }}"
+    mode: "0644"
   loop: "{{ birdfiles | default([]) }}"
   loop_control:
     loop_var: item
-  notify: reload_bird
-
+  notify: Reload bird
+...

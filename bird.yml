@@ -1,4 +1,5 @@
 ---
-- hosts: '*'
+- name: Run role bird
+  hosts: '*'
   roles:
     - lihas_bird

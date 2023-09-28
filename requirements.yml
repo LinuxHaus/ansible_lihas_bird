@@ -2,4 +2,4 @@
 - name: lihas_bird
   src: https://github.com/LinuxHaus/ansible_lihas_bird.git
   version: origin/main
-
+...
