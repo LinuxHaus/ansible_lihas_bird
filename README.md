@@ -33,6 +33,8 @@ ansible-playbook -i localhost, bird.yml
 * `bird.ipv6_local`
     * Abgehende IPv6 für eigene Pakete
 * bird.routerid
+* bird_kernelmain
+    * default true, use main kernel table
 * bird.scantime
 * bird.net_cix: []
 * bird.static: []

@@ -64,13 +64,15 @@ protocol static static_blackhole {
   route 224.0.0.0/3 unreachable;
 }
 
+{% if bird_kernelmain | default('true') %}
 protocol kernel {
   persist;
   scan time {{ hostvars[inventory_hostname].bird.scantime | default('10') }};
   import none;
-  export filter { krt_metric = 1000; krt_prefsrc = ip_local(); accept; };
+  export filter { krt_metric = 2000; krt_prefsrc = ip_local(); accept; };
 }
-include "/etc/bird/bird_protocols_*.conf";
+{% endif %}
 include "/etc/bird/bird_standortvernetzung*.conf";
+include "/etc/bird/bird_protocols_*.conf";
 
 include "/etc/bird/bird_this_location*.conf";
