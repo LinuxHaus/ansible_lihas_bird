@@ -61,4 +61,8 @@ ansible-playbook -i localhost, bird.yml
     * Interfaces in Area
 * %.config.bird.ospf3.X.interface.X.cost:
     * cost
-
+* %.config.bird.radv.X.interfaces: {}
+    * Interfaces
+* %.config.bird.radv.X.interfaces.X.prefix:
+* %.config.bird.radv.X.rdnss: []
+* %.config.bird.radv.X.dnssl: []
