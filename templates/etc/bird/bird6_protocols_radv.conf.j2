@@ -1,0 +1,57 @@
+# ansible managed
+{% if hostvars[inventory_hostname]['bird'] is defined %}
+{%   for radv in hostvars[inventory_hostname]['bird']['radv'] | default({}) | dict2items %}
+protocol radv {{ radv.key }} {
+    export all;
+    propagate routes no;
+{%  for rdnss in radv.value.rdnss | default([]) %}
+    rdnss {{ rdnss }};
+{%  endfor %}
+{%  if radv.value.dnssl is defined %}    dnssl {
+{% 	for domain in radv.value.dnssl | default([]) %}
+        domain "{{ domain }}";
+{% 	endfor %}
+    };
+{%  endif %}
+{%  for iface in radv.value.interfaces | default({}) | dict2items %}
+    interface "{{ iface.key }}" {
+{% 	if iface.value.preference is defined %}        route preference  {{ iface.value.preference }};{% endif %}
+{% 	for prefix in iface.value.prefix | default({}) | dict2items %}
+        prefix {{ prefix.key }} {
+        };
+{% 	endfor %}
+    };
+{%  endfor %}
+}
+{%   endfor %}
+{% endif %}
+
+{% for config in hostvars[inventory_hostname]['configspaces'] | default([]) %}
+{%   if hostvars[inventory_hostname][config]['config']['bird'] is defined and hostvars[inventory_hostname][config]['config']['bird']['radv'] is defined %}
+{%     for radv in hostvars[inventory_hostname][config]['config']['bird']['radv'] | default({}) | dict2items %}
+protocol radv {{ radv.key }} {
+    export all;
+    propagate routes no;
+{%  for rdnss in radv.value.rdnss | default([]) %}
+    rdnss {{ rdnss }};
+{%  endfor %}
+{%  if radv.value.dnssl is defined %}    dnssl {
+{% 	for domain in radv.value.dnssl | default([]) %}
+        domain "{{ domain }}";
+{% 	endfor %}
+    };
+{%  endif %}
+{%  for iface in radv.value.interfaces | default({}) | dict2items %}
+    interface "{{ iface.key }}" {
+{% 	if iface.value.preference is defined %}        route preference  {{ iface.value.preference }};{% endif %}
+{% 	for prefix in iface.value.prefix | default({}) | dict2items %}
+        prefix {{ prefix.key }} {
+        };
+{% 	endfor %}
+    };
+{%  endfor %}
+}
+{%     endfor %}
+{%   endif %}
+{% endfor %}
+
