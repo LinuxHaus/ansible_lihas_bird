@@ -1,0 +1,69 @@
+# ansible managed
+{% if hostvars[inventory_hostname]['bird'] is defined %}
+{%   for bgp in hostvars[inventory_hostname]['bird']['bgp'] | default({}) | dict2items %}
+{%     if bgp.value.neighbor.ip6 is defined %}
+protocol bgp {{ bgp.key }} {
+  bfd {{ bgp.value.bfd | default(hostvars[inventory_hostname]['bird']['bfd']['use'] | default('off')) }};
+{% if bgp.value.as is defined %}
+  local as {{ bgp.value.as }};
+{% elif hostvars[inventory_hostname].bird.as is defined %}
+  local as {{ hostvars[inventory_hostname].bird.as }};
+{% endif %}
+{% if bgp.value.password | default(hostvars[inventory_hostname].bird.bgp.password | default(false)) %}
+  password {{ bgp.value.password | default(hostvars[inventory_hostname].bird.bgp.password ) }};
+{% endif %}
+  neighbor {{ bgp.value.neighbor.ip6 }} as {{ bgp.value.neighbor.as }};
+  import {{ bgp.value.import_filter | default('all') }};
+  export {{ bgp.value.export_filter | default('all') }};
+  graceful restart 120;
+{% if bgp.value.igptable is defined %}
+  igp table {{ bgp.value.igptable }};
+{% elif hostvars[inventory_hostname].bird.igptable is defined %}
+  igp table  {{ hostvars[inventory_hostname].bird.igptable }};
+{% endif %}
+{% if bgp.value.sourceip is defined %}
+  source address {{ bgp.value.sourceip6 }};
+{% endif %}
+{% for extra in bgp.value.extra | default([]) %}
+  {{ extra }}
+{% endfor %}
+};
+{%     endif %}
+{%   endfor %}
+{% endif %}
+
+{% for config in hostvars[inventory_hostname]['configspaces'] | default([]) %}
+{%   if hostvars[inventory_hostname][config]['config']['bird'] is defined and hostvars[inventory_hostname][config]['config']['bird']['bgp'] is defined %}
+{%     for bgp in hostvars[inventory_hostname][config]['config']['bird']['bgp'] | default({}) | dict2items %}
+{%       if bgp.value.neighbor.ip6 is defined %}
+protocol bgp {{ bgp.key }} {
+  bfd {{ bgp.value.bfd | default(hostvars[inventory_hostname]['bird']['bfd']['use'] | default('off')) }};
+{% if bgp.value.as is defined %}
+  local as {{ bgp.value.as }};
+{% elif hostvars[inventory_hostname].bird.as is defined %}
+  local as {{ hostvars[inventory_hostname].bird.as }};
+{% endif %}
+{% if bgp.value.password | default(hostvars[inventory_hostname].bird.bgp.password | default(false)) %}
+  password {{ bgp.value.password | default(hostvars[inventory_hostname].bird.bgp.password) }};
+{% endif %}
+  neighbor {{ bgp.value.neighbor.ip6 }} as {{ bgp.value.neighbor.as }};
+  import {{ bgp.value.import_filter | default('all') }};
+  export {{ bgp.value.export_filter | default('all') }};
+  graceful restart 120;
+{% if bgp.value.igptable is defined %}
+  igp table {{ bgp.value.igptable }};
+{% elif hostvars[inventory_hostname].bird.igptable is defined %}
+  igp table  {{ hostvars[inventory_hostname].bird.igptable }};
+{% endif %}
+{% if bgp.value.sourceip is defined %}
+  source address {{ bgp.value.sourceip6 }};
+{% endif %}
+{% for extra in bgp.value.extra | default([]) %}
+  {{ extra }}
+{% endfor %}
+};
+{%       endif %}
+{%     endfor %}
+{%   endif %}
+{% endfor %}
+

@@ -29,9 +29,11 @@
   loop:
     - etc/bird/bird_protocols_static.conf
     - etc/bird/bird_protocols_ospf.conf
+    - etc/bird/bird_protocols_bgp.conf
     - etc/bird/bird.conf
     - etc/bird/bird6_protocols_static.conf
     - etc/bird/bird6_protocols_ospf.conf
+    - etc/bird/bird6_protocols_bgp.conf
     - etc/bird/bird6_protocols_radv.conf
     - etc/bird/bird6.conf
   loop_control:

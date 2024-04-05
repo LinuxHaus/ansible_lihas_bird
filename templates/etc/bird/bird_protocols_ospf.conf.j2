@@ -3,8 +3,8 @@
 {%   for ospf in hostvars[inventory_hostname]['bird']['ospf'] | default({}) | dict2items %}
 protocol ospf {{ ospf.key }} {
   preference 100;
-  import all;
-  export all;
+  import {{ ospf.value.import_filter | default('all') }};
+  export {{ ospf.value.export_filter | default('all') }};
   rfc1583compat no;
   stub router no;
   tick 1;

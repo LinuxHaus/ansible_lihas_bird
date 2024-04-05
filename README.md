@@ -29,7 +29,7 @@ ansible-playbook -i localhost, bird.yml
 
 ## Role Variables
 
-* bird.as: ASN
+* bird.as: Default ASN
 * `bird.ipv6_local`
     * Abgehende IPv6 für eigene Pakete
 * bird.routerid
@@ -45,6 +45,31 @@ ansible-playbook -i localhost, bird.yml
     * TODO: dictionary with filters consisting of lines 
 * bird.filter.bgprouting: []
     * TODO: content of filter named bgprouting
+* bird.bfd.use: bfd on/off
+    * Set global default for BFD
+* %.config.bird.bgp: {}
+    * BGP
+* bird.bgp.X.as: ASN
+* bird.bgp.X.import_filter: import filter
+* bird.bgp.X.export_filter: export filter
+* bird.bgp.X.bfd: bfd on/off
+* bird.bgp.X.neighbor.ip: neighbor IPv4
+* bird.bgp.X.neighbor.ip6: neighbor IPv6
+* bird.bgp.X.neighbor.as: neighbor ASN
+* bird.bgp.X.sourceip: IPv4
+* bird.bgp.X.sourceip6: IPv6
+* bird.bgp.X.extra: []
+* %.config.bird.bgp.X.as: ASN
+* %.config.bird.bgp.X.import_filter: import filter
+* %.config.bird.bgp.X.export_filter: export filter
+* %.config.bird.bgp.X.bfd: bfd on/off
+* %.config.bird.bgp.X.neighbor.ip: neighbor IPv4
+* %.config.bird.bgp.X.neighbor.ip6: neighbor IPv6
+* %.config.bird.bgp.X.neighbor.as: neighbor ASN
+* %.config.bird.bgp.X.sourceip: IPv4
+* %.config.bird.bgp.X.sourceip6: IPv6
+* %.config.bird.bgp.X.extra: []
+    * extra lines
 * %.config.bird.ospf: {}
     * Areas IPv4 OSPFv2
 * %.config.bird.ospf.X.import_filter: import filter
