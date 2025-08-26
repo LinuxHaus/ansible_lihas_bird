@@ -3,7 +3,7 @@
   ansible.builtin.include_role:
     name: lihas_variables
   when: configspaces is not defined
-- name: Install software
+- name: Install software bird1
   ansible.builtin.apt:
     name: "{{ item }}"
     state: present
@@ -11,6 +11,16 @@
     - bird
   loop_control:
     loop_var: item
+  when: lihas_bird_version | default(1) == 1
+- name: Install software bird2
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - bird2
+  loop_control:
+    loop_var: item
+  when: lihas_bird_version | default(1) == 2
 - name: Sysctl net.ipv4.ip_forward = 1
   ansible.posix.sysctl:
     name: net.ipv4.ip_forward
@@ -19,26 +29,40 @@
     sysctl_set: true
     state: present
     reload: true
-- name: Config files for bird
+- name: Config files for bird2 or bird1v4
   ansible.builtin.template:
-    src: "{{ file }}.j2"
-    dest: "/{{ file }}"
+    src: "etc/bird{{ lihas_bird_version | default(1) }}/{{ file }}.j2"
+    dest: "/etc/bird/{{ file }}"
     owner: root
     group: root
     mode: "0644"
   loop:
-    - etc/bird/bird_protocols_static.conf
-    - etc/bird/bird_protocols_ospf.conf
-    - etc/bird/bird_protocols_bgp.conf
-    - etc/bird/bird.conf
-    - etc/bird/bird6_protocols_static.conf
-    - etc/bird/bird6_protocols_ospf.conf
-    - etc/bird/bird6_protocols_bgp.conf
-    - etc/bird/bird6_protocols_radv.conf
-    - etc/bird/bird6.conf
+    - bird_filters_ansible.conf
+    - bird_protocols_static.conf
+    - bird_protocols_ospf.conf
+    - bird_protocols_bgp.conf
+    - bird.conf
   loop_control:
     loop_var: file
   notify: Reload bird
+- name: Config files for bird1v6
+  ansible.builtin.template:
+    src: "etc/bird{{ lihas_bird_version | default(1) }}/{{ file }}.j2"
+    dest: "/etc/bird/{{ file }}"
+    owner: root
+    group: root
+    mode: "0644"
+  loop:
+    - bird6_filters_ansible.conf
+    - bird6_protocols_static.conf
+    - bird6_protocols_ospf.conf
+    - bird6_protocols_bgp.conf
+    - bird6_protocols_radv.conf
+    - bird6.conf
+  loop_control:
+    loop_var: file
+  notify: Reload bird
+  when: lihas_bird_version | default(1) == 1
 - name: Extra bird config files, create list
   ansible.builtin.set_fact:
     birdfiles: "{{ birdfiles | default([]) + hostvars[inventory_hostname][item]['config']['bird']['templates'] | default([]) }}"

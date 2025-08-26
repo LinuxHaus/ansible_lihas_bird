@@ -1,0 +1,12 @@
+{% for config in hostvars[inventory_hostname]['configspaces'] | default([]) %}
+{%   if hostvars[inventory_hostname][config]['config']['bird'] is defined and hostvars[inventory_hostname][config]['config']['bird']['filter'] is defined %}
+{%     for filter in hostvars[inventory_hostname][config]['config']['bird']['filter'] | default({}) | dict2items %}
+filter {{ filter.key }} {
+{%       for line in filter.value | default([]) %}
+  {{ line }}
+{%       endfor %}
+}
+{%     endfor %}
+
+{%   endif %}
+{% endfor %}

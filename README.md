@@ -29,6 +29,8 @@ ansible-playbook -i localhost, bird.yml
 
 ## Role Variables
 
+* bird_version:
+    * Bird version, default 1, set 2 for bird 2.x
 * bird.as: Default ASN
 * `bird.ipv6_local`
     * Abgehende IPv6 für eigene Pakete
@@ -91,3 +93,7 @@ ansible-playbook -i localhost, bird.yml
 * %.config.bird.radv.X.interfaces.X.prefix:
 * %.config.bird.radv.X.rdnss: []
 * %.config.bird.radv.X.dnssl: []
+* %.config.bird.static: []
+    * static ipv4 route annoucements
+* %.config.bird.static6: []
+    * static ipv6 route annoucements

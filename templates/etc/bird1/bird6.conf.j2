@@ -44,9 +44,9 @@ protocol device {
 }
 
 protocol static static_blackhole {
-  # Blackhole um private IPs nicht ins Internet zu routen, hier als unreachable, damit gleich eine Fehlermeldung kommt
-  route 3ffe::/16 unreachable;
-  route 2001:db8::/32 unreachable;
+{% for i in lihas_bird_static_blackhole6 %}
+  {{ i }}
+{% endfor %}
 }
 
 {% if bird_kernelmain | default('true') %}

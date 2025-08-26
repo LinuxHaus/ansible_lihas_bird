@@ -1,0 +1,102 @@
+# ansible managed
+log syslog { warning, error, auth, fatal, bug };
+timeformat protocol iso long;
+
+include "/etc/bird/bird_this_host*.conf";
+
+router id {{ hostvars[inventory_hostname].bird.routerid }};
+
+function ip_local4 () {
+  return {{ hostvars[inventory_hostname].bird.routerid }};
+}
+function ip_local6 () {
+  return {{ hostvars[inventory_hostname].bird.ipv6_local }};
+}
+
+
+template bgp t_bgp_local {
+  local as {{ hostvars[inventory_hostname].bird.as }};
+}
+function defaultroute4() {
+  return net ~ [ 0.0.0.0/0 ];
+}
+function defaultroute6() {
+  return net ~ [ ::/0 ];
+}
+#function net_cix() {
+#  # CIX networks, don't export
+#  # return net ~ [ 100.100.0.0/16+ ];
+#  return false;
+#}
+function net_martian4() {
+  return net ~ [ 0.0.0.0/8, 10.0.0.0/8+, 100.64.0.0/10+, 127.0.0.0/8+, 169.254.0.0/16+, 172.16.0.0/12+,
+    192.0.0.0/24+, 192.0.2.0/24+, 192.168.0.0/16+, 198.18.0.0/15+, 198.51.100.0/24+, 203.0.113.0/24+, 224.0.0.0/3+ ];
+}
+function net_martian6() {
+  if net ~ [ 3ffe::/16+, 2001:db8::/32+ ] then return true;
+  if net ~ [ 2001::/32 ] then return false;
+  if net ~ [ 2001::/32+ ] then return true;
+  if net ~ [ 2002::/16 ] then return false;
+  if net ~ [ 2a10::/12+ ] then return false;
+  if net ~ [ 2002::/16+, 0000::/8+, fe00::/9+, fe00::/8+ ] then return true;
+  if net ~ [ 2000::/3{3,48}, 0::/0{0,56} ] then return false;
+  return true;
+}
+
+filter nodefaultroute {
+  if net ~ [ 0.0.0.0/0 ] then reject;
+  else accept;
+}
+
+include "/etc/bird/bird_filters_*.conf";
+{% if hostvars[inventory_hostname].bird.filters.bgprouting is not defined %}
+filter bgprouting {
+  krt_metric = 100;       
+  if net = 0.0.0.0/0 then reject;
+  if net ~ [ 10.0.0.0/8+ ] then accept;
+  if net ~ [ 172.16.0.0/12+ ] then accept;
+  if net ~ [ 192.168.0.0/16+ ] then accept;
+  reject;
+}
+{% endif %}
+include "/etc/bird/bird_templates_*.conf";
+
+protocol device {
+  scan time {{ hostvars[inventory_hostname].bird.scantime | default('10') }};           # Scan interfaces every {{ hostvars[inventory_hostname].bird.scantime | default('10') }} seconds
+}
+
+protocol static static_blackhole4 {
+  ipv4;
+{% for i in lihas_bird_static_blackhole4 %}
+  {{ i }}
+{% endfor %}
+}
+protocol static static_blackhole6 {
+  ipv6;
+{% for i in lihas_bird_static_blackhole6 %}
+  {{ i }}
+{% endfor %}
+}
+
+{% if bird_kernelmain | default('true') %}
+protocol kernel kernel6{
+  persist;
+  scan time {{ hostvars[inventory_hostname].bird.scantime | default('10') }};
+  ipv6 {
+    import none;
+    export filter { krt_metric = 2000; krt_prefsrc = ip_local(); accept; };
+  }
+}
+protocol kernel kernel4 {
+  persist;
+  scan time {{ hostvars[inventory_hostname].bird.scantime | default('10') }};
+  ipv4 {
+    import none;
+    export filter { krt_metric = 2000; krt_prefsrc = ip_local(); accept; };
+  }
+}
+{% endif %}
+include "/etc/bird/bird_standortvernetzung*.conf";
+include "/etc/bird/bird_protocols_*.conf";
+
+include "/etc/bird/bird_this_location*.conf";

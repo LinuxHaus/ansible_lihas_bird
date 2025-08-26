@@ -1,7 +1,7 @@
 ---
 - name: Reload bird
   ansible.builtin.shell:
-    cmd: "birdc configure || systemctl start bird; birdc configure; birdc6 configure || systemctl start bird6; birdc6 configure"
+    cmd: "birdc configure || systemctl start bird; birdc configure"
 - name: Reload bird6
   ansible.builtin.shell:
     cmd: "birdc6 configure || systemctl start bird6; birdc6 configure"
