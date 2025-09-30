@@ -29,7 +29,7 @@ ansible-playbook -i localhost, bird.yml
 
 ## Role Variables
 
-* bird_version:
+* lihas_bird_version:
     * Bird version, default 1, set 2 for bird 2.x
 * bird.as: Default ASN
 * `bird.ipv6_local`
@@ -54,6 +54,8 @@ ansible-playbook -i localhost, bird.yml
 * bird.bgp.X.as: ASN
 * bird.bgp.X.import_filter: import filter
 * bird.bgp.X.export_filter: export filter
+* bird.bgp.X.import_filter6: import filter ipv6
+* bird.bgp.X.export_filter6: export filter ipv6
 * bird.bgp.X.bfd: bfd on/off
 * bird.bgp.X.neighbor.ip: neighbor IPv4
 * bird.bgp.X.neighbor.ip6: neighbor IPv6
@@ -61,9 +63,15 @@ ansible-playbook -i localhost, bird.yml
 * bird.bgp.X.sourceip: IPv4
 * bird.bgp.X.sourceip6: IPv6
 * bird.bgp.X.extra: []
+* %.config.bird.filter:
+    * TODO: dictionary with filters consisting of lines 
+* %.config.bird.filter.bgprouting: []
+    * TODO: content of filter named bgprouting
 * %.config.bird.bgp.X.as: ASN
 * %.config.bird.bgp.X.import_filter: import filter
 * %.config.bird.bgp.X.export_filter: export filter
+* %.config.bird.bgp.X.import_filter6: import filter IPv6
+* %.config.bird.bgp.X.export_filter6: export filter IPv6
 * %.config.bird.bgp.X.bfd: bfd on/off
 * %.config.bird.bgp.X.neighbor.ip: neighbor IPv4
 * %.config.bird.bgp.X.neighbor.ip6: neighbor IPv6

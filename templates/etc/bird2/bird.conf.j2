@@ -4,23 +4,23 @@ timeformat protocol iso long;
 
 include "/etc/bird/bird_this_host*.conf";
 
-router id {{ hostvars[inventory_hostname].bird.routerid }};
+router id {{ bird.routerid }};
 
-function ip_local4 () {
-  return {{ hostvars[inventory_hostname].bird.routerid }};
+function ip_local4 () -> ip {
+  return {{ bird.routerid }};
 }
-function ip_local6 () {
-  return {{ hostvars[inventory_hostname].bird.ipv6_local }};
+function ip_local6 () -> ip {
+  return {{ bird.ipv6_local }};
 }
 
 
 template bgp t_bgp_local {
-  local as {{ hostvars[inventory_hostname].bird.as }};
+  local as {{ bird.as }};
 }
-function defaultroute4() {
+function defaultroute4() -> bool {
   return net ~ [ 0.0.0.0/0 ];
 }
-function defaultroute6() {
+function defaultroute6() -> bool {
   return net ~ [ ::/0 ];
 }
 #function net_cix() {
@@ -28,11 +28,11 @@ function defaultroute6() {
 #  # return net ~ [ 100.100.0.0/16+ ];
 #  return false;
 #}
-function net_martian4() {
+function net_martian4() -> bool {
   return net ~ [ 0.0.0.0/8, 10.0.0.0/8+, 100.64.0.0/10+, 127.0.0.0/8+, 169.254.0.0/16+, 172.16.0.0/12+,
     192.0.0.0/24+, 192.0.2.0/24+, 192.168.0.0/16+, 198.18.0.0/15+, 198.51.100.0/24+, 203.0.113.0/24+, 224.0.0.0/3+ ];
 }
-function net_martian6() {
+function net_martian6() -> bool {
   if net ~ [ 3ffe::/16+, 2001:db8::/32+ ] then return true;
   if net ~ [ 2001::/32 ] then return false;
   if net ~ [ 2001::/32+ ] then return true;
@@ -49,7 +49,7 @@ filter nodefaultroute {
 }
 
 include "/etc/bird/bird_filters_*.conf";
-{% if hostvars[inventory_hostname].bird.filters.bgprouting is not defined %}
+{% if bird.filters.bgprouting is not defined %}
 filter bgprouting {
   krt_metric = 100;       
   if net = 0.0.0.0/0 then reject;
@@ -62,7 +62,7 @@ filter bgprouting {
 include "/etc/bird/bird_templates_*.conf";
 
 protocol device {
-  scan time {{ hostvars[inventory_hostname].bird.scantime | default('10') }};           # Scan interfaces every {{ hostvars[inventory_hostname].bird.scantime | default('10') }} seconds
+  scan time {{ bird.scantime | default('10') }};           # Scan interfaces every {{ bird.scantime | default('10') }} seconds
 }
 
 protocol static static_blackhole4 {
@@ -81,19 +81,21 @@ protocol static static_blackhole6 {
 {% if bird_kernelmain | default('true') %}
 protocol kernel kernel6{
   persist;
-  scan time {{ hostvars[inventory_hostname].bird.scantime | default('10') }};
+  scan time {{ bird.scantime | default('10') }};
+  metric 2000;
   ipv6 {
     import none;
-    export filter { krt_metric = 2000; krt_prefsrc = ip_local(); accept; };
-  }
+    export filter { krt_prefsrc = ip_local6(); accept; };
+  };
 }
 protocol kernel kernel4 {
   persist;
-  scan time {{ hostvars[inventory_hostname].bird.scantime | default('10') }};
+  scan time {{ bird.scantime | default('10') }};
+  metric 2000;
   ipv4 {
     import none;
-    export filter { krt_metric = 2000; krt_prefsrc = ip_local(); accept; };
-  }
+    export filter { krt_prefsrc = ip_local4(); accept; };
+  };
 }
 {% endif %}
 include "/etc/bird/bird_standortvernetzung*.conf";

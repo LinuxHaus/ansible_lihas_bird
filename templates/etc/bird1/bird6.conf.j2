@@ -4,13 +4,13 @@ timeformat protocol iso long;
 
 include "/etc/bird/bird6_this_host*.conf";
 
-router id {{ hostvars[inventory_hostname].bird.routerid }};
+router id {{ bird.routerid }};
 
 function ip_local () {
-  return {{ hostvars[inventory_hostname].bird.ipv6_local }};
+  return {{ bird.ipv6_local }};
 }
 template bgp t_bgp_local {
-  local as {{ hostvars[inventory_hostname].bird.as }};
+  local as {{ bird.as }};
 }
 function defaultroute() {
   return net ~ [ ::/0 ];
@@ -40,7 +40,7 @@ include "/etc/bird/bird6_filters_*.conf";
 include "/etc/bird/bird6_templates_*.conf";
 
 protocol device {
-  scan time {{ hostvars[inventory_hostname].bird.scantime | default('10') }};           # Scan interfaces every {{ hostvars[inventory_hostname].bird.scantime | default('10') }} seconds
+  scan time {{ bird.scantime | default('10') }};           # Scan interfaces every {{ bird.scantime | default('10') }} seconds
 }
 
 protocol static static_blackhole {
@@ -52,7 +52,7 @@ protocol static static_blackhole {
 {% if bird_kernelmain | default('true') %}
 protocol kernel {
   persist;
-  scan time {{ hostvars[inventory_hostname].bird.scantime | default('10') }};
+  scan time {{ bird.scantime | default('10') }};
   import none;
   export filter { krt_metric = 2000; krt_prefsrc = ip_local(); accept; };
 }

@@ -2,7 +2,7 @@
 - name: Include variables
   ansible.builtin.include_role:
     name: lihas_variables
-  when: configspaces is not defined
+#  when: configspaces is not defined
 - name: Install software bird1
   ansible.builtin.apt:
     name: "{{ item }}"
@@ -29,6 +29,16 @@
     sysctl_set: true
     state: present
     reload: true
+- name: collect protocols
+  ansible.builtin.set_fact:
+    birdprotocols: "{{ birdprotocols | default({}) | ansible.builtin.combine( hostvars[inventory_hostname][item]['config']['bird'] | default({}), recursive=true ) }}"
+    cacheable: false
+  loop: "{{ configspaces }}"
+- name: collect protocols, local
+  ansible.builtin.set_fact:
+    birdprotocols: "{{ birdprotocols | default({}) | ansible.builtin.combine( hostvars[inventory_hostname]['bird'] | default({}), recursive=true ) }}"
+    cacheable: false
+  when: hostvars[inventory_hostname]['bird'] is defined
 - name: Config files for bird2 or bird1v4
   ansible.builtin.template:
     src: "etc/bird{{ lihas_bird_version | default(1) }}/{{ file }}.j2"
@@ -63,6 +73,19 @@
     loop_var: file
   notify: Reload bird
   when: lihas_bird_version | default(1) == 1
+- name: Config files for bird2
+  ansible.builtin.template:
+    src: "etc/bird{{ lihas_bird_version | default(1) }}/{{ file }}.j2"
+    dest: "/etc/bird/{{ file }}"
+    owner: root
+    group: root
+    mode: "0644"
+  loop:
+    - bird_protocols_radv.conf
+  loop_control:
+    loop_var: file
+  notify: Reload bird
+  when: lihas_bird_version | default(1) == 2
 - name: Extra bird config files, create list
   ansible.builtin.set_fact:
     birdfiles: "{{ birdfiles | default([]) + hostvars[inventory_hostname][item]['config']['bird']['templates'] | default([]) }}"

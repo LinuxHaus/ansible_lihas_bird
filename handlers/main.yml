@@ -5,3 +5,4 @@
 - name: Reload bird6
   ansible.builtin.shell:
     cmd: "birdc6 configure || systemctl start bird6; birdc6 configure"
+  when: lihas_bird_version | default(1) == 1
