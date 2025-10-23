@@ -1,8 +1,27 @@
 # ansible managed
+{% for static in birdprotocols['staticnamed'] | default({}) | dict2items %}
+protocol static {{ static.key }} {
+{%   if static.value.check_link is defined %}
+    check link {{ static.value.check_link | replace('True','on') }};
+{%   endif %}
+    {{ static.value.channel | default('ipv4') }} {
+{%   if static.value.table is defined %}
+        table {{ static.value.table }};
+{%   endif %}
+{%   if static.value.preference is defined %}
+        preference {{ static.value.preference }};
+{%   endif %}
+    };
+{%   for route in static.value.routes | default([]) %}
+    {{ route }}
+{%   endfor %}
+};
+{% endfor %}
+
 {% if hostvars[inventory_hostname]['bird'] is defined and hostvars[inventory_hostname]['bird']['static'] is defined %}
 protocol static static4_{{ inventory_hostname | replace('-','_') }} {
     ipv4;
-{% for route in hostvars[inventory_hostname]['bird']['static'] %}
+{%   for route in hostvars[inventory_hostname]['bird']['static'] %}
     {{ route }}
 {%   endfor %}
 }

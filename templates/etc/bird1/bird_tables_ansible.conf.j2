@@ -1,0 +1,4 @@
+# ansible managed
+{% for table in birdprotocols['tables'] | default({}) | dict2items %}
+{{ table.value.channel | default('ipv4') }} table {{ table.key }};
+{% endfor %}

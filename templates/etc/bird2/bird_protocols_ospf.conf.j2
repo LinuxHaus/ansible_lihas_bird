@@ -6,16 +6,34 @@ protocol ospf {{ ospf['version'] | default('v2') }} ospf_{{ ospf['version'] | de
   ipv4 {
     import {{ ospf.value.import_filter | default('all') }};
     export {{ ospf.value.export_filter | default('all') }};
+{%   if ospf.value.preference is defined %}
+    preference {{ ospf.value.preference }};
+{%   endif %}
+{%   if ospf.value.table is defined %}
+    table {{ ospf.value.table }};
+{%   endif %}
   };
 {%   endif %}
 {%   if ospf['version'] | default('v2') == "v3" %}
   ipv4 {
     import {{ ospf.value.import_filter | default('all') }};
     export {{ ospf.value.export_filter | default('all') }};
+{%   if ospf.value.preference is defined %}
+    preference {{ ospf.value.preference }};
+{%   endif %}
+{%   if ospf.value.table is defined %}
+    table {{ ospf.value.table }};
+{%   endif %}
   };
   ipv6 {
     import {{ ospf.value.import_filter6 | default('all') }};
     export {{ ospf.value.export_filter6 | default('all') }};
+{%   if ospf.value.preference6 is defined or ospf.value.preference is defined %}
+    preference {{ ospf.value.preference6 | default(ospf.value.preference) }};
+{%   endif %}
+{%   if ospf.value.table6 is defined or ospf.value.table is defined %}
+    table {{ ospf.value.table6 | default(ospf.value.table) }};
+{%   endif %}
   };
 {%   endif %}
   rfc1583compat no;

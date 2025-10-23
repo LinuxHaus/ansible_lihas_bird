@@ -4,10 +4,10 @@ timeformat protocol iso long;
 
 include "/etc/bird/bird_this_host*.conf";
 
-router id {{ bird.routerid }};
+router id {{ bird.routerid | default(ansible_default_ipv4.address) }};
 
 function ip_local4 () -> ip {
-  return {{ bird.routerid }};
+  return {{ bird.routerid | default(ansible_default_ipv4.address) }};
 }
 function ip_local6 () -> ip {
   return {{ bird.ipv6_local }};
@@ -33,14 +33,33 @@ function net_martian4() -> bool {
     192.0.0.0/24+, 192.0.2.0/24+, 192.168.0.0/16+, 198.18.0.0/15+, 198.51.100.0/24+, 203.0.113.0/24+, 224.0.0.0/3+ ];
 }
 function net_martian6() -> bool {
-  if net ~ [ 3ffe::/16+, 2001:db8::/32+ ] then return true;
-  if net ~ [ 2001::/32 ] then return false;
-  if net ~ [ 2001::/32+ ] then return true;
-  if net ~ [ 2002::/16 ] then return false;
-  if net ~ [ 2a10::/12+ ] then return false;
-  if net ~ [ 2002::/16+, 0000::/8+, fe00::/9+, fe00::/8+ ] then return true;
-  if net ~ [ 2000::/3{3,48}, 0::/0{0,56} ] then return false;
-  return true;
+# check https://6session.wordpress.com/2009/04/08/ipv6-martian-and-bogon-filters/
+  if net ~ [ ::/96+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ ::/128+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ ::1/128+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ ::ffff:0000:0000/96+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ ::df00:0000/104+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ ::7f00:0000/104+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ ::0000:0000/104+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ ::ff00:0000/104+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ 0000::/8+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ 0200::/7+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ 3ffe::/16+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ 2001:db8::/32+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ 2002:e000::/20+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ 2002:7f00::/24+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ 2002:0000::/24+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ 2002:ff00::/24+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ 2002:ff00::/24+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ 2002:0a00::/24+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ 2002:ac10::/28+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ 2002:c0a8::/32+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ fc00::/7+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ fe80::/10+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ fec0::/10+ ] then { print "Reject ", net, " martian"; return true; }
+  if net ~ [ ff00::/8+ ] then { print "Reject ", net, " martian"; return true; }
+
+  return false;
 }
 
 filter nodefaultroute {
@@ -48,7 +67,8 @@ filter nodefaultroute {
   else accept;
 }
 
-include "/etc/bird/bird_filters_*.conf";
+include "/etc/bird/bird_tables_*.conf";
+include "/etc/bird/bird_functions_*.conf";
 {% if bird.filters.bgprouting is not defined %}
 filter bgprouting {
   krt_metric = 100;       
@@ -99,6 +119,7 @@ protocol kernel kernel4 {
 }
 {% endif %}
 include "/etc/bird/bird_standortvernetzung*.conf";
+include "/etc/bird/bird_filters_*.conf";
 include "/etc/bird/bird_protocols_*.conf";
 
 include "/etc/bird/bird_this_location*.conf";

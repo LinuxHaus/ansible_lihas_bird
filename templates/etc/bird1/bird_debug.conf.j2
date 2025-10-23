@@ -1,0 +1,4 @@
+# Working configuration:
+{% for line in (birdprotocols | tojson(indent=2)).split('\n') %}
+# {{ line }}
+{% endfor %}

@@ -30,6 +30,7 @@ filter nodefaultroute {
   else accept;
 }
 
+include "/etc/bird/bird_tables_*.conf";
 include "/etc/bird/bird_filters_*.conf";
 {% if bird.filters.bgprouting is not defined %}
 filter bgprouting {

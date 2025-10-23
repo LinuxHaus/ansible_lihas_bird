@@ -1,7 +1,19 @@
 {% for filter in birdprotocols.filter | default({}) | dict2items() %}
-filter {{ filter.key }} {
-{%   for line in filter.value | default([]) %}
+{%   if filter.value is mapping %}
+filter {{ filter.key }}
+{%     for line in filter.value.header | default([]) %}
   {{ line }}
-{%   endfor %}
+{%     endfor %}
+{
+{%     for line in filter.value.body | default([]) %}
+  {{ line }}
+{%     endfor %}
 }
+{%   else %}
+filter {{ filter.key }} {
+{%     for line in filter.value | default([]) %}
+  {{ line }}
+{%     endfor %}
+}
+{%   endif %}
 {% endfor %}

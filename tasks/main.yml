@@ -47,10 +47,14 @@
     group: root
     mode: "0644"
   loop:
+    - bird_debug.conf
     - bird_filters_ansible.conf
-    - bird_protocols_static.conf
-    - bird_protocols_ospf.conf
+    - bird_functions_ansible.conf
     - bird_protocols_bgp.conf
+    - bird_protocols_kernel.conf
+    - bird_protocols_ospf.conf
+    - bird_protocols_static.conf
+    - bird_tables_ansible.conf
     - bird.conf
   loop_control:
     loop_var: file

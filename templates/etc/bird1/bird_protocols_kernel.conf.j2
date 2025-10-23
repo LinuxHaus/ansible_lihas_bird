@@ -1,0 +1,15 @@
+{% for protocol in birdprotocols.kernel | default({}) | dict2items() %}
+protocol kernel {{ protocol.key }} {
+  kernel table {{ protocol.value.kernel_table | default('main') }};
+{%     if protocol.value.graceful_restart is defined %}
+  graceful restart {{ protocol.value.graceful_restart | replace('True','yes') }};
+{%     endif %}
+  metric {{ protocol.value.metric | default('32') }};
+  scan time {{ scantime | default(birdprotocols.scantime | default('10') ) }};
+  import {{ import_filter | default('none') }};
+  export {{ export_filter | default('all') }};
+{%     if protocol.value.table is defined %}
+  table {{ protocol.value.table }};
+{%     endif %}
+}
+{% endfor %}
