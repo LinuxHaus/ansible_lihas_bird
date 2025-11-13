@@ -1,0 +1,8 @@
+{% for protocol in birdprotocols.pipe | default({}) | dict2items() %}
+protocol pipe {{ protocol.key }} {
+  table {{ protocol.value.table | default('master4') }};
+  peer table {{ protocol.value.peer_table }};
+  import {{ import_filter | default('all') }};
+  export {{ export_filter | default('all') }};
+}
+{% endfor %}
