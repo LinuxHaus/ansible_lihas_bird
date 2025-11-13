@@ -53,6 +53,7 @@
     - bird_protocols_bgp.conf
     - bird_protocols_kernel.conf
     - bird_protocols_ospf.conf
+    - bird_protocols_pipe.conf
     - bird_protocols_static.conf
     - bird_tables_ansible.conf
     - bird.conf
