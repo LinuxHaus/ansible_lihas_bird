@@ -39,7 +39,7 @@ protocol ospf {{ ospf['version'] | default('v2') }} ospf_{{ ospf['version'] | de
   rfc1583compat no;
   stub router no;
   tick 1;
-  ecmp no;
+  ecmp {{ ospf.value.ecmp | default('no') }};
 {%   for area in ospf.value.area | default({}) | dict2items %}
   # {{ area }}
   area {{ area.key }} {
@@ -54,9 +54,17 @@ protocol ospf {{ ospf['version'] | default('v2') }} ospf_{{ ospf['version'] | de
       retransmit 5;
       priority 10;
       wait 40;
-      type bcast;
+      type {{ iface.value.type | default('bcast') }};
+{%     if iface.value.neighbors is defined %}
+      neighbors {
+{%       for neighbor in iface.value.neighbors | default([]) %}
+        {{ neighbor }};
+{%       endfor %}
+      };
+{%     endif %}
+{%     if iface.value.ecmp_weight is defined    %}      ecmp weight {{ iface.value.ecmp_weight }};{% endif %}
 {%     if iface.value.authentication is defined %}      authentication  {{ iface.value.authentication }};{% endif %}
-{%     if iface.value.password is defined %}      password  "{{ iface.value.password }}";{% endif %}
+{%     if iface.value.password is defined       %}      password  "{{ iface.value.password }}";{% endif %}
     };
 {%     endfor %}
   };

@@ -104,11 +104,17 @@ The result can be viewed in `/etc/bird/bird_debug.conf`
 * bird.ospf.X.preference: optional ospf preference
 * bird.ospf.X.import_filter: import filter
 * bird.ospf.X.export_filter: export filter
+* bird.ospf.X.neighbors: []
+    * Neighbors if needed
+* bird.ospf.X.ecmp: Use ecmp, default no
 * bird.ospf.X.area: {}
 * bird.ospf.X.area.X.interface: {}
     * Interfaces in Area
 * bird.ospf.X.area.X.interface.X.cost:
     * cost
+* bird.ospf.X.area.X.interface.X.ecmp_weight
+* bird.ospf.X.area.X.interface.X.authentication
+* bird.ospf.X.area.X.interface.X.password
 * bird.ospf3: {}
     * Areas IPv6 OSPFv3
 * bird.ospf3.X.import_filter: import filter
