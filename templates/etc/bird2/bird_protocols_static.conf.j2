@@ -19,7 +19,7 @@ protocol static {{ static.key }} {
 {% endfor %}
 
 {% if hostvars[inventory_hostname]['bird'] is defined and hostvars[inventory_hostname]['bird']['static'] is defined %}
-protocol static static4_{{ inventory_hostname | replace('-','_') }} {
+protocol static static4_{{ inventory_hostname | replace('-','_') | replace('.','_') }} {
     ipv4;
 {%   for route in hostvars[inventory_hostname]['bird']['static'] %}
     {{ route }}
@@ -28,7 +28,7 @@ protocol static static4_{{ inventory_hostname | replace('-','_') }} {
 {% endif %}
 
 {% if hostvars[inventory_hostname].bird is defined and hostvars[inventory_hostname]['bird']['static6'] is defined %}
-protocol static static6_{{ inventory_hostname | replace('-','_') }} {
+protocol static static6_{{ inventory_hostname | replace('-','_') | replace('.','_') }} {
     ipv6;
 {%   for route in hostvars[inventory_hostname]['bird']['static6']%}
     {{ route }}
@@ -40,7 +40,7 @@ protocol static static6_{{ inventory_hostname | replace('-','_') }} {
 {% for config in configspaces | default([]) %}
 #  {{ config }}
 {%   if hostvars[inventory_hostname][config]['config']['bird'] is defined and hostvars[inventory_hostname][config]['config']['bird']['static'] is defined %}
-protocol static static4_{{ config | replace('-','_') }} {
+protocol static static4_{{ config | replace('-','_') | replace('.','_') }} {
     ipv4;
 {%     for route in hostvars[inventory_hostname][config]['config']['bird']['static'] %}
     {{ route }}
@@ -48,7 +48,7 @@ protocol static static4_{{ config | replace('-','_') }} {
 }
 {%   endif %}
 {%   if hostvars[inventory_hostname][config]['config']['bird'] is defined and hostvars[inventory_hostname][config]['config']['bird']['static6'] is defined %}
-protocol static static6_{{ config | replace('-','_') }} {
+protocol static static6_{{ config | replace('-','_') | replace('.','_') }} {
     ipv6;
 {%     for route in hostvars[inventory_hostname][config]['config']['bird']['static6'] %}
     {{ route }}
