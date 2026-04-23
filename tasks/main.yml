@@ -56,6 +56,7 @@
     - bird_protocols_pipe.conf
     - bird_protocols_static.conf
     - bird_tables_ansible.conf
+    - bird_variables.conf
     - bird.conf
   loop_control:
     loop_var: file

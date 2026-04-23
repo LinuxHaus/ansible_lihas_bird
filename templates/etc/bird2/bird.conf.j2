@@ -2,6 +2,7 @@
 log syslog { warning, error, auth, fatal, bug };
 timeformat protocol iso long;
 
+include "/etc/bird/bird_variables*.conf";
 include "/etc/bird/bird_this_host*.conf";
 
 router id {{ bird.routerid | default(ansible_default_ipv4.address) }};

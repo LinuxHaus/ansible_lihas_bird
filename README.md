@@ -12,6 +12,7 @@ Currently supported protocols:
 Files managed by this role:
 * `bird_filters_ansible.conf`
 * `/etc/bird/bird_filters_ansible.conf`
+* `/etc/bird/bird_variables.conf`
 * `/etc/bird/bird_protocols_bgp.conf`
 * `/etc/bird/bird_protocols_ospf.conf`
 * `/etc/bird/bird_protocols_static.conf`
@@ -53,6 +54,9 @@ The result can be viewed in `/etc/bird/bird_debug.conf`
 * bird.bfd.use: bfd on/off
     * Set global default for BFD
 * bird.net_cix: []
+### Variables / Constants
+* bird.variables: {} bird2+ only
+* bird.variables.KEY: VALUE
 ### Functions
 * bird.functions: bird2+ only
 * bird.functions.X.header: []

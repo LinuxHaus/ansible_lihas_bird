@@ -1,8 +1,8 @@
 # ansible managed
 {% for ospf in birdprotocols['ospf'] | default({}) | dict2items %}
 # {{ ospf }}
-protocol ospf {{ ospf['version'] | default('v2') }} ospf_{{ ospf['version'] | default('v2') }}_{{ ospf.key }} {
-{%   if ospf['version'] | default('v2') == "v2" %}
+protocol ospf {{ ospf.value.version | default('v2') }} ospf_{{ ospf.value.version | default('v2') }}_{{ ospf.key }} {
+{%   if ospf.value.version | default('v2') == "v2" %}
   ipv4 {
     import {{ ospf.value.import_filter | default('all') }};
     export {{ ospf.value.export_filter | default('all') }};
@@ -14,17 +14,7 @@ protocol ospf {{ ospf['version'] | default('v2') }} ospf_{{ ospf['version'] | de
 {%   endif %}
   };
 {%   endif %}
-{%   if ospf['version'] | default('v2') == "v3" %}
-  ipv4 {
-    import {{ ospf.value.import_filter | default('all') }};
-    export {{ ospf.value.export_filter | default('all') }};
-{%   if ospf.value.preference is defined %}
-    preference {{ ospf.value.preference }};
-{%   endif %}
-{%   if ospf.value.table is defined %}
-    table {{ ospf.value.table }};
-{%   endif %}
-  };
+{%   if ospf.value.version | default('v2') == "v3" %}
   ipv6 {
     import {{ ospf.value.import_filter6 | default('all') }};
     export {{ ospf.value.export_filter6 | default('all') }};
