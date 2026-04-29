@@ -1,0 +1,4 @@
+# ansible managed
+{% for variable in birdprotocols['variables'] | default({}) | dict2items %}
+define {{ variable.key }} = {{ variable.value }};
+{% endfor %}
