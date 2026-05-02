@@ -33,8 +33,31 @@ protocol ospf {{ ospf.value.version | default('v2') }} ospf_{{ ospf.value.versio
 {%   for area in ospf.value.area | default({}) | dict2items %}
   # {{ area }}
   area {{ area.key }} {
-    external {
+    networks {
+{%     if area.value.networks is defined %}
+{%       for network in area.value.networks | default([]) %}
+      {{ network }};
+{%       endfor %}
+{%     else %}
+{%       if ospf.value.version | default('v2') == "v3" %}
+      ::/0;
+{%       else %}
       0.0.0.0/0;
+{%       endif %}
+{%     endif %}
+    };
+    external {
+{%     if area.value.external is defined %}
+{%       for external in area.value.external | default([]) %}
+      {{ external }};
+{%       endfor %}
+{%     else %}
+{%       if ospf.value.version | default('v2') == "v3" %}
+      ::/0;
+{%       else %}
+      0.0.0.0/0;
+{%       endif %}
+{%     endif %}
     };
 {%     for iface in area.value.interface | default({}) | dict2items %}
     interface "{{ iface.key }}" {

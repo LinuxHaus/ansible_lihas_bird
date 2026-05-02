@@ -103,7 +103,8 @@ The result can be viewed in `/etc/bird/bird_debug.conf`
 * bird.bgp.X.extra: []
 ### Protocol ospf v2/v3
 * bird.ospf: {}
-    * Areas IPv4 OSPFv2
+    * Areas IPv4 OSPFv2 or OSPFv3
+* bird.ospf.X.version: v2 or v3, default v2
 * bird.ospf.X.table: optional alternative bird table
 * bird.ospf.X.preference: optional ospf preference
 * bird.ospf.X.import_filter: import filter
@@ -119,6 +120,8 @@ The result can be viewed in `/etc/bird/bird_debug.conf`
 * bird.ospf.X.area.X.interface.X.ecmp_weight
 * bird.ospf.X.area.X.interface.X.authentication
 * bird.ospf.X.area.X.interface.X.password
+* bird.ospf.X.area.X.external: []
+    * external networks, devault 0.0.0.0/0 or ::/0 matching v2/v3
 * bird.ospf3: {}
     * Areas IPv6 OSPFv3
 * bird.ospf3.X.import_filter: import filter
