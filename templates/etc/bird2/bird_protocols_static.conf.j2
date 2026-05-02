@@ -2,7 +2,7 @@
 {% for static in birdprotocols['staticnamed'] | default({}) | dict2items %}
 protocol static {{ static.key }} {
 {%   if static.value.check_link is defined %}
-    check link {{ static.value.check_link | replace('True','on') }};
+    check link {{ static.value.check_link | replace('True','on') | replace('False','off') }};
 {%   endif %}
     {{ static.value.channel | default('ipv4') }} {
 {%   if static.value.table is defined %}
