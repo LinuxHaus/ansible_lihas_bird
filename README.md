@@ -98,6 +98,7 @@ The result can be viewed in `/etc/bird/bird_debug.conf`
 * bird.bgp.X.neighbor.ip: neighbor IPv4
 * bird.bgp.X.neighbor.ip6: neighbor IPv6
 * bird.bgp.X.neighbor.as: neighbor ASN
+* bird.bgp.X.routerid: router id, looks like IPv4-address
 * bird.bgp.X.sourceip: IPv4
 * bird.bgp.X.sourceip6: IPv6
 * bird.bgp.X.extra: []

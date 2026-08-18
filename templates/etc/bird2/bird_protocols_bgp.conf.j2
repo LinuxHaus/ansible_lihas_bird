@@ -1,6 +1,9 @@
 # ansible managed
 {% for bgp in birdprotocols['bgp'] | default({}) | dict2items %}
 protocol bgp {{ bgp.key }} {
+{%     if bgp.value.routerid is defined %}
+  router id {{ bgp.value.routerid }};
+{%     endif%}
 {%     if bgp.value.neighbor.ip is defined %}
   local {{ bgp.value.sourceip | default(omit) }} port {{ bgp.value.sourceport | default("179") }} as {{ bgp.value.as | default(bird.as) }};
   neighbor {{ bgp.value.neighbor.ip }} port {{ bgp.value.neighbor.port | default("179") }} as {{ bgp.value.neighbor.as }};
