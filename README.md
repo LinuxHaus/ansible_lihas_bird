@@ -87,21 +87,37 @@ The result can be viewed in `/etc/bird/bird_debug.conf`
 * bird.static6: []
     * static ipv6 route annoucements, simple routes
 ### Protocol bgp
+If `bird.bgp.X.neighbor.ip` and `bird.bgp.X.neighbor.ip6` are defined creates two BGP session, one for IPv4 and IPv6 each.
+
+If `bird.bgp.X.channel4` and `bird.bgp.X.channel6` are defined, but only one of `bird.bgp.X.neighbor.ip` and `bird.bgp.X.neighbor.ip6`, create a multiprotocol BGP session.
+
 * bird.bgp: {}
     * BGP
 * bird.bgp.X.as: ASN
-* bird.bgp.X.import_filter: import filter
-* bird.bgp.X.export_filter: export filter
-* bird.bgp.X.import_filter6: import filter ipv6
-* bird.bgp.X.export_filter6: export filter ipv6
 * bird.bgp.X.bfd: bfd on/off
-* bird.bgp.X.neighbor.ip: neighbor IPv4
-* bird.bgp.X.neighbor.ip6: neighbor IPv6
-* bird.bgp.X.neighbor.as: neighbor ASN
-* bird.bgp.X.routerid: router id, looks like IPv4-address
-* bird.bgp.X.sourceip: IPv4
-* bird.bgp.X.sourceip6: IPv6
+* bird.bgp.X.channel4.export_filter: default bird.bgp.X.export_filter
+* bird.bgp.X.channel4.extra: list of extra lines ion section channel4 {}
+* bird.bgp.X.channel4: If present, do IPv4 announcements even on IPv6 BGP, e.g. multiprotocol
+* bird.bgp.X.channel4.import_filter: default bird.bgp.X.import_filter
+* bird.bgp.X.channel6.export_filter: default bird.bgp.X.export_filter6
+* bird.bgp.X.channel6.extra: list of extra lines ion section channel6 {}
+* bird.bgp.X.channel6: If present, do IPv6 announcements even on IPv4 BGP, e.g. multiprotocol
+* bird.bgp.X.channel6.import_filter: default bird.bgp.X.import_filter6
+* bird.bgp.X.export_filter6: export filter ipv6
+* bird.bgp.X.export_filter: export filter
 * bird.bgp.X.extra: []
+* bird.bgp.X.igptable: igp table if neeeded, default bird.igptable
+* bird.bgp.X.import_filter6: import filter ipv6
+* bird.bgp.X.import_filter: import filter
+* bird.bgp.X.neighbor.as: neighbor ASN
+* bird.bgp.X.neighbor.ip6: neighbor IPv6
+* bird.bgp.X.neighbor.ip: neighbor IPv4
+* bird.bgp.X.neighbor.port: port, default 179
+* bird.bgp.X.password: bgp password if needed
+* bird.bgp.X.routerid: router id, looks like IPv4-address
+* bird.bgp.X.sourceip: IPv4 BGP
+* bird.bgp.X.sourceip6: IPv6 BGP
+* bird.bgp.X.sourceport: IPv4 source port
 ### Protocol ospf v2/v3
 * bird.ospf: {}
     * Areas IPv4 OSPFv2 or OSPFv3
