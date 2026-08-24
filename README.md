@@ -57,6 +57,8 @@ The result can be viewed in `/etc/bird/bird_debug.conf`
 ### Variables / Constants
 * bird.variables: {} bird2+ only
 * bird.variables.KEY: VALUE
+### Tables
+* bird.tables.X.channel: new Kernel table X with channel ipv4/ipv6
 ### Functions
 * bird.functions: bird2+ only
 * bird.functions.X.header: []
@@ -118,6 +120,17 @@ If `bird.bgp.X.channel4` and `bird.bgp.X.channel6` are defined, but only one of 
 * bird.bgp.X.sourceip: IPv4 BGP
 * bird.bgp.X.sourceip6: IPv6 BGP
 * bird.bgp.X.sourceport: IPv4 source port
+### Protocol kernel
+* bird.kernel: {}
+* bird.kernel.X.kernel_table: OS routing table to use, if set
+* bird.kernel.X.table: Bird routing table to use, if set
+* bird.kernel.X.graceful_restart: Use graceful restart yes/no
+* bird.kernel.X.metric: Metric in routing table
+* bird.kernel.X.scantime: Time between kernel roting table scans
+* bird.kernel.X.channel: ipv4/ipv6
+* bird.kernel.X.channel.import_filter
+* bird.kernel.X.channel.export_filter
+
 ### Protocol ospf v2/v3
 * bird.ospf: {}
     * Areas IPv4 OSPFv2 or OSPFv3
@@ -147,6 +160,13 @@ If `bird.bgp.X.channel4` and `bird.bgp.X.channel6` are defined, but only one of 
     * Interfaces in Area
 * bird.ospf3.X.interface.X.cost:
     * cost
+### Protocol pipe
+* bird.pipe.X: Pipe X
+* bird.pipe.X.table: table
+* bird.pipe.X.peer_table: peer table
+* bird.pipe.X.import_filter: import filter
+* bird.pipe.X.export_filter: export filter
+
 ### Protocol radv
 * bird.radv.X.interfaces: {}
     * Interfaces
